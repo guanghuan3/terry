@@ -1,5 +1,6 @@
 package com.terry.archer.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -8,6 +9,7 @@ import org.springframework.context.ApplicationContextAware;
  * Created by Administrator
  * on 2019/7/28.
  */
+@Slf4j
 public class ApplicationContextUtil implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
@@ -18,7 +20,12 @@ public class ApplicationContextUtil implements ApplicationContextAware {
      * @return
      */
     public static Object getBean(String beanId) {
-        return applicationContext.getBean(beanId);
+        try {
+            return applicationContext.getBean(beanId);
+        } catch (Exception e) {
+            log.info("获取Bean失败：没有获取到[{}]", new Object[]{beanId});
+            return null;
+        }
     }
 
     /**
@@ -27,7 +34,12 @@ public class ApplicationContextUtil implements ApplicationContextAware {
      * @return
      */
     public static Object getBean(Class<?> clazz) {
-        return applicationContext.getBean(clazz);
+        try {
+            return applicationContext.getBean(clazz);
+        } catch (Exception e) {
+            log.info("获取Bean失败：没有获取到[{}]", new Object[]{clazz});
+            return null;
+        }
     }
 
     @Override
