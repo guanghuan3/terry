@@ -2,23 +2,20 @@ package com.terry.archer.excel;
 
 import com.terry.archer.excel.annotation.ExcelField;
 import com.terry.archer.excel.annotation.ExcelFields;
+import com.terry.archer.excel.enums.ExcelFileType;
 import com.terry.archer.excel.format.FieldFormat;
 import com.terry.archer.excel.format.UserAnno;
 import com.terry.archer.utils.ApplicationContextUtil;
 import com.terry.archer.utils.CommonUtil;
 import com.terry.archer.utils.StringUtil;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -30,18 +27,58 @@ public class ExcelExportSupport {
 
     private static Logger logger = LoggerFactory.getLogger(ExcelExportSupport.class);
 
-    public static void main(String[] args) {
-        /*List<UserAnno> la = new ArrayList<>();
+    private static final String EXCEL_EXT_XLSX = ".xlsx";
+
+    public static void main(String[] args) throws Exception {
+        List<UserAnno> la = new ArrayList<>();
         UserAnno ua = new UserAnno("zhangsan", 15, new Date());
         la.add(ua);
 
         ua = new UserAnno("lisi", 17, new Date());
         la.add(ua);
 
-        handleExcelFieldList(UserAnno.class);*/
+        exportExcel(la, UserAnno.class, new File("D:/zhangwenbin/excel/test.xlsx"));
+    }
 
-        UserAnno ua = new UserAnno();
-        System.err.println(ua.getClass().equals(UserAnno.class));
+    private static Workbook createWorkbook(String fileName) {
+        if (CommonUtil.isNotEmpty(fileName)) {
+            String ext = fileName.substring(fileName.lastIndexOf("."));
+            return createWorkbook(EXCEL_EXT_XLSX.equals(ext) ? ExcelFileType.XLSX : ExcelFileType.XLS);
+        } else {
+            // 默认生成HSSFWorkBook
+            return new HSSFWorkbook();
+        }
+    }
+
+    private static Workbook createWorkbook(ExcelFileType excelFileTypeEnum) {
+        if (CommonUtil.isNotEmpty(excelFileTypeEnum)
+                && ExcelFileType.XLSX.equals(excelFileTypeEnum)) {
+            return new XSSFWorkbook();
+        } else {
+            return new HSSFWorkbook();
+        }
+    }
+
+    /**
+     * 输出文件到指定目录对象
+     * @param datas
+     * @param clazz
+     * @param file
+     * @throws Exception
+     */
+    public static void exportExcel(List<?> datas, Class<?> clazz, File file) throws Exception {
+        if (!CommonUtil.isNotEmpty(file)) {
+            return ;
+        }
+        if (!file.getParentFile().exists()) {
+            file.mkdirs();
+        }
+        FileOutputStream f = new FileOutputStream(file);
+        exportExcel(datas, clazz, createWorkbook(file.getName()), new FileOutputStream(file));
+    }
+
+    public static void exportExcel(List<?> datas, Class<?> clazz, ExcelFileType excelType, OutputStream os) throws Exception {
+        exportExcel(datas, clazz, createWorkbook(excelType), os);
     }
 
     public static void exportExcel(List<?> datas, Class<?> clazz, Workbook wb, OutputStream os) throws Exception {
@@ -60,6 +97,7 @@ public class ExcelExportSupport {
                 // 输出excel
                 writeExcel(wb, os);
             }
+
         } else {
             // 入参为空，日志提示
             logger.info("执行：ExcelExportSupport.exportExcel(List, Class)未成功！入参为空");
@@ -75,7 +113,7 @@ public class ExcelExportSupport {
         List<ExcelField> excelFields = null;
         if (CommonUtil.isNotEmpty(clazz)) {
             // 类的excel集合注解
-            ExcelFields efs = clazz.getAnnotation(ExcelFields.class);
+            ExcelFields efs = clazz.getDeclaredAnnotation(ExcelFields.class);
             // 解析excel集合注解
             if (CommonUtil.isNotEmpty(efs)) {
                 // 数组转化成集合，方便之后的操作
@@ -111,28 +149,35 @@ public class ExcelExportSupport {
         Method m = null;
         // 临时存放字段值
         Object value = null;
+        // 临时存放数据对象
+        Object data = null;
+        // 临时存放ExcelField对象
+        ExcelField anno = null;
 
         // 创建行数据
         for (int i = 0; i < datas.size(); i ++) {
-            if (!datas.get(i).getClass().equals(clazz)) {
-                logger.info("导出数据对象不匹配：[{}]不能转换为[{}]", new Object[]{datas.get(i).getClass(), clazz});
+            data = datas.get(i);
+            if (!data.getClass().equals(clazz)) {
+                logger.info("导出数据对象不匹配：[{}]不能转换为[{}]", new Object[]{data.getClass(), clazz});
                 continue;
             }
             row = sheet.createRow(i);
 
             // 创建行内字段数据
             for (int j = 0; j < excelFieldList.size(); j ++) {
+                anno = excelFieldList.get(j);
+
                 // 字段原始值
                 value =  clazz.getMethod(
                         StringUtil.getMethodByAttr(
-                                excelFieldList.get(j).attr())).invoke(datas.get(i));
+                                anno.attr())).invoke(data);
 
                 // 整理输出格式
-                value = ((FieldFormat) ApplicationContextUtil.getBean(excelFieldList.get(j).format()))
+                value = ((FieldFormat) ApplicationContextUtil.getBean(anno.format()))
                         .format(value, excelFieldList.get(j).pattern());
 
-                // 为行内字段设置值
-                cell = row.createCell(j);
+                // 设置excel展示内容
+                row.createCell(j).setCellValue(String.valueOf(value));
             }
         }
     }
