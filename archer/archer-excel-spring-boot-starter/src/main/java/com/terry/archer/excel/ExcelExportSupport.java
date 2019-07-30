@@ -4,20 +4,28 @@ import com.terry.archer.excel.annotation.ExcelField;
 import com.terry.archer.excel.annotation.ExcelFields;
 import com.terry.archer.excel.enums.ExcelFileType;
 import com.terry.archer.excel.format.FieldFormat;
-import com.terry.archer.excel.format.UserAnno;
 import com.terry.archer.utils.ApplicationContextUtil;
 import com.terry.archer.utils.CommonUtil;
 import com.terry.archer.utils.StringUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Administrator
@@ -29,7 +37,9 @@ public class ExcelExportSupport {
 
     private static final String EXCEL_EXT_XLSX = ".xlsx";
 
-    public static void main(String[] args) throws Exception {
+    /*public static void main(String[] args) throws Exception {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ExcelConfiguration.class);
+
         List<UserAnno> la = new ArrayList<>();
         UserAnno ua = new UserAnno("zhangsan", 15, new Date());
         la.add(ua);
@@ -38,7 +48,7 @@ public class ExcelExportSupport {
         la.add(ua);
 
         exportExcel(la, UserAnno.class, new File("D:/zhangwenbin/excel/test.xlsx"));
-    }
+    }*/
 
     private static Workbook createWorkbook(String fileName) {
         if (CommonUtil.isNotEmpty(fileName)) {
@@ -154,9 +164,17 @@ public class ExcelExportSupport {
         // 临时存放ExcelField对象
         ExcelField anno = null;
 
-        // 创建行数据
-        for (int i = 0; i < datas.size(); i ++) {
-            data = datas.get(i);
+        // 输出表头，第一行
+        Row head = sheet.createRow(0);
+        for (int i = 0; i < excelFieldList.size(); i ++) {
+            cell = head.createCell(i);
+            // 输出表头文字
+            cell.setCellValue(excelFieldList.get(i).label());
+        }
+
+        // 创建行数据，从excel第二行开始
+        for (int i = 1; i <= datas.size(); i ++) {
+            data = datas.get(i - 1);
             if (!data.getClass().equals(clazz)) {
                 logger.info("导出数据对象不匹配：[{}]不能转换为[{}]", new Object[]{data.getClass(), clazz});
                 continue;
@@ -188,6 +206,14 @@ public class ExcelExportSupport {
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("执行导出excel方法失败：{}", new Object[]{e.toString()});
+        } finally {
+            if (CommonUtil.isNotEmpty(wb)) {
+                try {
+                    wb.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
