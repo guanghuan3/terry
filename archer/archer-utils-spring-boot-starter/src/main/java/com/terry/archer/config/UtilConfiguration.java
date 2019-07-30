@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * on 2019/7/29.
  */
 @Configuration
-public class UtilConfig {
+public class UtilConfiguration {
 
     @Bean
     public ApplicationContextUtil applicationContextUtil(){
