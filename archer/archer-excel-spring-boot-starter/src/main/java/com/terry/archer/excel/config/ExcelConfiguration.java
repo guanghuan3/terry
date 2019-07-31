@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Primary;
 public class ExcelConfiguration {
 
     /**
-     * 默认的字段格式化输出处理
+     * 默认的字段格式化输出处理，以字符串String输出
      * @return
      */
     @Primary
