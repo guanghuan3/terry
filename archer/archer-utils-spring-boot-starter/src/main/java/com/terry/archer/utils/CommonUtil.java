@@ -23,13 +23,13 @@ public class CommonUtil {
             return false;
         } else {
             if (obj instanceof String) {
-                return ((String) obj).length() >= 0;
+                return ((String) obj).length() > 0;
             } else if (obj instanceof Object[]) {
-                return ((Object[]) obj).length >= 0;
+                return ((Object[]) obj).length > 0;
             } else if (obj instanceof Collection) {
-                return ((Collection) obj).size() >= 0;
+                return ((Collection) obj).size() > 0;
             } else if (obj instanceof Map) {
-                return ((Map) obj).size() >= 0;
+                return ((Map) obj).size() > 0;
             } else {
                 return true;
             }
