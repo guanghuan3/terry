@@ -2,6 +2,7 @@ package com.terry.archer.excel;
 
 import com.terry.archer.excel.annotation.ExcelField;
 import com.terry.archer.excel.annotation.ExcelFields;
+import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.enums.ExcelFileType;
 import com.terry.archer.excel.format.FieldFormat;
 import com.terry.archer.utils.ApplicationContextUtil;
@@ -126,16 +127,27 @@ public class ExcelExportSupport {
             ExcelFields efs = clazz.getDeclaredAnnotation(ExcelFields.class);
             // 解析excel集合注解
             if (CommonUtil.isNotEmpty(efs)) {
+                excelFields = new ArrayList<>();
                 // 数组转化成集合，方便之后的操作
-                excelFields = Arrays.asList(efs.fields());
+                ExcelField[] fileds = efs.fields();
+                for (ExcelField ef : fileds) {
+                    // 不止只支持导入操作
+                    if (!ef.action().equals(ExcelAction.IMPORT)) {
+                        excelFields.add(ef);
+                    }
+                }
 
             } else {
                 // 获取所有声明的字段
                 Field[] fields = clazz.getDeclaredFields();
                 // 搜集field的注解
                 excelFields = new ArrayList<>();
+                ExcelField ef = null;
                 for (Field f : fields) {
-                    if (CommonUtil.isNotEmpty(f.getDeclaredAnnotation(ExcelField.class))) {
+                    ef = f.getDeclaredAnnotation(ExcelField.class);
+                    // 不为空且不是只支持导入操作
+                    if (CommonUtil.isNotEmpty(ef)
+                            && !ef.action().equals(ExcelAction.IMPORT)) {
                         excelFields.add(f.getAnnotation(ExcelField.class));
                     }
                 }
@@ -207,6 +219,13 @@ public class ExcelExportSupport {
             e.printStackTrace();
             logger.error("执行导出excel方法失败：{}", new Object[]{e.toString()});
         } finally {
+            if (CommonUtil.isNotEmpty(os)) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             if (CommonUtil.isNotEmpty(wb)) {
                 try {
                     wb.close();
