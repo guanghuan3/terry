@@ -77,8 +77,10 @@ public class DateUtil {
         try {
             // 从常用的日期格式中获取，如果不再常用格式中，视为临时创建格式
             if (CommonUtil.isNotEmpty(DateFormatHolder.dateFormatMap.get(pattern))) {
+                log.info("当前操作的输入/输出格式为常用配置格式：{}", new Object[]{pattern});
                 return DateFormatHolder.dateFormatMap.get(pattern).parse(dateSource);
             } else {
+                log.info("当前操作的输入/输出格式不是常用的格式：{}", new Object[]{pattern});
                 return new SimpleDateFormat(pattern).parse(dateSource);
             }
         } catch (ParseException e) {
