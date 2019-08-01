@@ -49,5 +49,5 @@ public @interface ExcelField {
      * 数据格式化处理类，FieldFormat接口实现类
      * @return
      */
-    Class format() default StringFieldFormat.class;
+    Class<? extends FieldFormat> format() default StringFieldFormat.class;
 }
