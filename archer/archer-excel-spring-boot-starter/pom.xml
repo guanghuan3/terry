@@ -32,7 +32,7 @@
             <version>2.1.6.RELEASE</version>
         </dependency>
 
-        <!-- 支持spring-boot-configuration动态外部配置 -->
+        <!-- 支持spring-boot-configuration动态外部配置, properties等文件类型 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
