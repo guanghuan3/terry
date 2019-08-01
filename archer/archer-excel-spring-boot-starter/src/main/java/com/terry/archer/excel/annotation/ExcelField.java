@@ -1,5 +1,6 @@
 package com.terry.archer.excel.annotation;
 
+import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.format.FieldFormat;
 import com.terry.archer.excel.format.FieldTypeEnum;
 import com.terry.archer.excel.format.impl.StringFieldFormat;
@@ -34,12 +35,6 @@ public @interface ExcelField {
     short sort() default 99;
 
     /**
-     * excel数据类型
-     * @return
-     */
-//    FieldTypeEnum type() default FieldTypeEnum.STRING;
-
-    /**
      * 数据输出格式
      * @return
      */
@@ -50,4 +45,10 @@ public @interface ExcelField {
      * @return
      */
     Class<? extends FieldFormat> format() default StringFieldFormat.class;
+
+    /**
+     * 支持导入导出操作
+     * @return
+     */
+    ExcelAction action() default ExcelAction.ALL;
 }
