@@ -25,4 +25,12 @@ public class UtilConfiguration {
     public ApplicationContextUtil applicationContextUtil(){
         return new ApplicationContextUtil();
     }
+
+    public String getDatePatterns() {
+        return datePatterns;
+    }
+
+    public void setDatePatterns(String datePatterns) {
+        this.datePatterns = datePatterns;
+    }
 }
