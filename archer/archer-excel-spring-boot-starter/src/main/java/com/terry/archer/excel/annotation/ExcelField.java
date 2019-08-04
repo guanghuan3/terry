@@ -1,8 +1,8 @@
 package com.terry.archer.excel.annotation;
 
+import com.terry.archer.excel.enums.AlignType;
 import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.format.FieldFormat;
-import com.terry.archer.excel.format.FieldTypeEnum;
 import com.terry.archer.excel.format.impl.StringFieldFormat;
 
 import java.lang.annotation.*;
@@ -33,6 +33,12 @@ public @interface ExcelField {
      * @return
      */
     short sort() default 99;
+
+    /**
+     * 单元格水平模式，默认靠左
+     * @return
+     */
+    AlignType align() default AlignType.CENTER;
 
     /**
      * 数据输出格式
