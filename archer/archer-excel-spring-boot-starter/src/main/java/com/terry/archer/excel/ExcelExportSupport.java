@@ -9,10 +9,7 @@ import com.terry.archer.utils.ApplicationContextUtil;
 import com.terry.archer.utils.CommonUtil;
 import com.terry.archer.utils.StringUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +21,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,19 +33,6 @@ public class ExcelExportSupport {
     private static Logger logger = LoggerFactory.getLogger(ExcelExportSupport.class);
 
     private static final String EXCEL_EXT_XLSX = ".xlsx";
-
-    /*public static void main(String[] args) throws Exception {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ExcelConfiguration.class);
-
-        List<UserAnno> la = new ArrayList<>();
-        UserAnno ua = new UserAnno("zhangsan", 15, new Date());
-        la.add(ua);
-
-        ua = new UserAnno("lisi", 17, new Date());
-        la.add(ua);
-
-        exportExcel(la, UserAnno.class, new File("D:/zhangwenbin/excel/test.xlsx"));
-    }*/
 
     private static Workbook createWorkbook(String fileName) {
         if (CommonUtil.isNotEmpty(fileName)) {
@@ -84,7 +67,6 @@ public class ExcelExportSupport {
         if (!file.getParentFile().exists()) {
             file.mkdirs();
         }
-        FileOutputStream f = new FileOutputStream(file);
         exportExcel(datas, clazz, createWorkbook(file.getName()), new FileOutputStream(file));
     }
 
@@ -175,6 +157,8 @@ public class ExcelExportSupport {
         Object data = null;
         // 临时存放ExcelField对象
         ExcelField anno = null;
+        // 单元格格式
+        CellStyle defaultStyle = null;
 
         // 输出表头，第一行
         Row head = sheet.createRow(0);
@@ -206,9 +190,31 @@ public class ExcelExportSupport {
                 value = ((FieldFormat) ApplicationContextUtil.getBean(anno.format()))
                         .format(value, excelFieldList.get(j).pattern());
 
-                // 设置excel展示内容
-                row.createCell(j).setCellValue(String.valueOf(value));
+                cell = row.createCell(j);
+                if (CommonUtil.isNotEmpty(value)) {
+                    // 设置单元格横向格式
+                    if (CommonUtil.isNotEmpty(anno.align())) {
+                        defaultStyle = cell.getCellStyle();
+                        createAlignCellStyle(anno, defaultStyle);
+                        cell.setCellStyle(defaultStyle);
+                    }
+                    // 设置excel展示内容
+                    cell.setCellValue(String.valueOf(value));
+                }
             }
+        }
+    }
+
+    private static void createAlignCellStyle(ExcelField anno, CellStyle defaultStyle) {
+        switch (anno.align()) {
+            case CENTER:
+                defaultStyle.setAlignment(HorizontalAlignment.CENTER);
+                break;
+            case RIGHT:
+                defaultStyle.setAlignment(HorizontalAlignment.RIGHT);
+                break;
+            default:
+                defaultStyle.setAlignment(HorizontalAlignment.LEFT);
         }
     }
 
