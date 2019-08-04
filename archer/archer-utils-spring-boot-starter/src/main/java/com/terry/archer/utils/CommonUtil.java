@@ -35,4 +35,8 @@ public class CommonUtil {
             }
         }
     }
+
+    public static boolean isEmpty(Object obj) {
+        return !isNotEmpty(obj);
+    }
 }
