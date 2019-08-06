@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UtilConfiguration {
 
+    /**
+     * Date patterns and seperated by dot
+     */
     private String datePatterns;
 
     @Bean
