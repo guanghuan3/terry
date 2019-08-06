@@ -35,7 +35,7 @@ public class ApplicationContextUtil implements ApplicationContextAware {
      * @param clazz
      * @return
      */
-    public static Object getBean(Class<?> clazz) {
+    public static <T> T getBean(Class<T> clazz) {
         try {
             return APPLICATION_CONTEXT.getBean(clazz);
         } catch (Exception e) {
