@@ -41,7 +41,7 @@ public @interface ExcelField {
     AlignType align() default AlignType.CENTER;
 
     /**
-     * 数据输出格式
+     * 数据输出格式，与FieldFormat配对使用，单独设置不生效
      * @return
      */
     String pattern() default "";
