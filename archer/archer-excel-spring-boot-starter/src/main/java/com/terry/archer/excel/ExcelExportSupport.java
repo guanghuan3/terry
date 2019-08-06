@@ -2,6 +2,9 @@ package com.terry.archer.excel;
 
 import com.terry.archer.excel.annotation.ExcelField;
 import com.terry.archer.excel.annotation.ExcelFields;
+import com.terry.archer.excel.cellstyle.ExcelCellStyle;
+import com.terry.archer.excel.cellstyle.impl.DefaultCellStyle;
+import com.terry.archer.excel.enums.AlignType;
 import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.enums.ExcelFileType;
 import com.terry.archer.excel.format.FieldFormat;
@@ -13,6 +16,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -157,15 +161,17 @@ public class ExcelExportSupport {
         Object data = null;
         // 临时存放ExcelField对象
         ExcelField anno = null;
-        // 单元格格式
-        CellStyle defaultStyle = null;
 
+        // 表头格式
+        CellStyle headStyle = wb.createCellStyle();
+        headStyle.setAlignment(HorizontalAlignment.CENTER);
         // 输出表头，第一行
         Row head = sheet.createRow(0);
         for (int i = 0; i < excelFieldList.size(); i ++) {
             cell = head.createCell(i);
             // 输出表头文字
             cell.setCellValue(excelFieldList.get(i).label());
+            cell.setCellStyle(headStyle);
         }
 
         // 创建行数据，从excel第二行开始
@@ -190,31 +196,53 @@ public class ExcelExportSupport {
                 value = ((FieldFormat) ApplicationContextUtil.getBean(anno.format()))
                         .format(value, excelFieldList.get(j).pattern());
 
+                // 渲染单元格
                 cell = row.createCell(j);
-                if (CommonUtil.isNotEmpty(value)) {
-                    // 设置单元格横向格式
-                    if (CommonUtil.isNotEmpty(anno.align())) {
-                        defaultStyle = cell.getCellStyle();
-                        createAlignCellStyle(anno, defaultStyle);
-                        cell.setCellStyle(defaultStyle);
-                    }
-                    // 设置excel展示内容
-                    cell.setCellValue(String.valueOf(value));
-                }
+                renderCell(wb, cell, anno, value);
             }
         }
     }
 
-    private static void createAlignCellStyle(ExcelField anno, CellStyle defaultStyle) {
-        switch (anno.align()) {
+    private static void renderCell(Workbook wb, Cell cell, ExcelField anno, Object value) {
+        if (CommonUtil.isNotEmpty(value)) {
+            CellStyle cs = null;
+            // 如果是默认的无样式单元格
+            if (DefaultCellStyle.class.equals(anno.cellStyle())) {
+                // 如果不是默认的水平靠左，则重新创建
+                if (!AlignType.LEFT.equals(anno.align())) {
+                    // 设置单元格水平位置
+                    cs = wb.createCellStyle();
+                    createAlignCellStyle(anno.align(), cs);
+                }
+            }
+            // 获取自定义样式，输出自定义渲染效果
+            else {
+                ExcelCellStyle ecs = (ExcelCellStyle) ApplicationContextUtil.getBean(anno.cellStyle());
+                if (CommonUtil.isNotEmpty(ecs)) {
+                    cs = ecs.createCellStyle(wb, cell);
+                }
+            }
+
+            // 样式存在时设置变更的渲染样式
+            if (CommonUtil.isNotEmpty(cs)) {
+                cell.setCellStyle(cs);
+            }
+
+            // 设置单元格内容
+            cell.setCellValue(String.valueOf(value));
+        }
+    }
+
+    private static void createAlignCellStyle(AlignType type, CellStyle cs) {
+        switch (type) {
             case CENTER:
-                defaultStyle.setAlignment(HorizontalAlignment.CENTER);
+                cs.setAlignment(HorizontalAlignment.CENTER);
                 break;
             case RIGHT:
-                defaultStyle.setAlignment(HorizontalAlignment.RIGHT);
+                cs.setAlignment(HorizontalAlignment.RIGHT);
                 break;
             default:
-                defaultStyle.setAlignment(HorizontalAlignment.LEFT);
+                cs.setAlignment(HorizontalAlignment.LEFT);
         }
     }
 
