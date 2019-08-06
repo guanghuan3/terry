@@ -1,5 +1,7 @@
 package com.terry.archer.excel.annotation;
 
+import com.terry.archer.excel.cellstyle.ExcelCellStyle;
+import com.terry.archer.excel.cellstyle.impl.DefaultCellStyle;
 import com.terry.archer.excel.enums.AlignType;
 import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.format.FieldFormat;
@@ -38,7 +40,13 @@ public @interface ExcelField {
      * 单元格水平模式，默认靠左
      * @return
      */
-    AlignType align() default AlignType.CENTER;
+    AlignType align() default AlignType.LEFT;
+
+    /**
+     * 自定义单元格样式
+     * @return
+     */
+    Class<? extends ExcelCellStyle> cellStyle() default DefaultCellStyle.class;
 
     /**
      * 数据输出格式，与FieldFormat配对使用，单独设置不生效
