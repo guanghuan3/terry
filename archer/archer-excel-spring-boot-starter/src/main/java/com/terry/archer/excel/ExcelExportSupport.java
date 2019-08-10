@@ -193,7 +193,7 @@ public class ExcelExportSupport {
                                 anno.attr())).invoke(data);
 
                 // 整理输出格式
-                value = ((FieldFormat) ApplicationContextUtil.getBean(anno.format()))
+                value = ApplicationContextUtil.getBean(anno.format())
                         .format(value, excelFieldList.get(j).pattern());
 
                 // 渲染单元格
@@ -217,7 +217,7 @@ public class ExcelExportSupport {
             }
             // 获取自定义样式，输出自定义渲染效果
             else {
-                ExcelCellStyle ecs = (ExcelCellStyle) ApplicationContextUtil.getBean(anno.cellStyle());
+                ExcelCellStyle ecs = ApplicationContextUtil.getBean(anno.cellStyle());
                 if (CommonUtil.isNotEmpty(ecs)) {
                     cs = ecs.createCellStyle(wb, cell);
                 }
