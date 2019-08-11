@@ -2,6 +2,7 @@ package com.terry.archer.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -14,37 +15,10 @@ import java.util.Map;
 @Slf4j
 public class JsonUtil {
 
-    private String username;
-
-    private String age;
-
-    private JsonUtil jsonUtil;
-
-    public JsonUtil getJsonUtil() {
-        return jsonUtil;
-    }
-
-    public void setJsonUtil(JsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getAge() {
-        return age;
-    }
-
-    public void setAge(String age) {
-        this.age = age;
-    }
-
     private static final ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
 
     public static String objectToJson(Object obj) {
         try {
