@@ -4,7 +4,6 @@ import com.terry.archer.datasource.RoutingDataSource;
 import com.terry.archer.datasource.annotation.DSAspect;
 import com.terry.archer.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -25,18 +24,15 @@ import java.util.Set;
 @Configuration
 public class DBConfiguration {
 
-    @Autowired
-    private DBConfigurationProperties dbConfigurationProperties;
-
     @Primary
     @Bean
-    public DataSource dataSource() {
+    public DataSource dataSource(DBConfigurationProperties dbConfigurationProperties) {
         // 必须设置默认数据源名称
         if (CommonUtil.isNotEmpty(dbConfigurationProperties)
                 && CommonUtil.isNotEmpty(dbConfigurationProperties.getDefaultName())) {
 
             // 创建动态路由数据源
-            DataSource dataSource = createDataSource();
+            DataSource dataSource = createDataSource(dbConfigurationProperties);
 
             log.info("初始化动态数据源连接池完成.");
             return dataSource;
@@ -47,7 +43,7 @@ public class DBConfiguration {
         }
     }
 
-    private DataSource createDataSource() {
+    private DataSource createDataSource(DBConfigurationProperties dbConfigurationProperties) {
         RoutingDataSource rdb = new RoutingDataSource();
 
         // 配置的默认数据源名称
@@ -151,13 +147,5 @@ public class DBConfiguration {
     @Bean
     public DSAspect dSAspect() {
         return new DSAspect();
-    }
-
-    public DBConfigurationProperties getDbConfigurationProperties() {
-        return dbConfigurationProperties;
-    }
-
-    public void setDbConfigurationProperties(DBConfigurationProperties dbConfigurationProperties) {
-        this.dbConfigurationProperties = dbConfigurationProperties;
     }
 }
