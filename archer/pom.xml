@@ -10,6 +10,7 @@
   <modules>
     <module>archer-excel-spring-boot-starter</module>
     <module>archer-utils-spring-boot-starter</module>
+    <module>archer-datasource-spring-boot-starter</module>
   </modules>
 
   <name>archer</name>
