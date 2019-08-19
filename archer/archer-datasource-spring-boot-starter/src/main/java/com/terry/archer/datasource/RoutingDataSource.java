@@ -21,11 +21,18 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
         return DataSourceHolder.DATASOURCE_NAMES.get();
     }
 
+    /**
+     * 重置数据源为默认数据源
+     */
     public void resetDatasource() {
         log.info("Datasource is reset to default.");
         DataSourceHolder.DATASOURCE_NAMES.remove();
     }
 
+    /**
+     * 切换数据源到指定的数据源
+     * @param datasourceName
+     */
     public void switchDatasource(String datasourceName) {
         log.info("Switch datasource to [{}]", new Object[]{datasourceName});
         DataSourceHolder.DATASOURCE_NAMES.set(datasourceName);
