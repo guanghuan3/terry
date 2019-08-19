@@ -19,6 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 多数据源配置类
+ * 在配置项archer.datasource.enable=true时生效
+ */
 @Slf4j
 @ConditionalOnProperty(prefix = "archer.datasource", name = "enable", havingValue = "true")
 @Configuration
@@ -144,6 +148,10 @@ public class DBConfiguration {
         targetDataSource.put(dsName, dataSource);
     }
 
+    /**
+     * 对@DS注解操作的切面
+     * @return
+     */
     @Bean
     public DSAspect dSAspect() {
         return new DSAspect();
