@@ -29,6 +29,7 @@ import java.util.Map;
           poolClassType: com.alibaba.druid.pool.DruidDataSource
           properties:
             jdbcUrl: jdbc:mysql://ip2:port/dataBaseName?useSSL=false&useUnicode=true&characterEncoding=utf-8
+            # 驱动名称属性不一样
             driverClass: com.mysql.cj.jdbc.Driver
             ......
         # 快速配置数据源，使用默认基础配置（极简），名称为default
