@@ -31,17 +31,6 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
         DataSourceHolder.DATASOURCE_NAMES.set(datasourceName);
     }
 
-    /**
-     * 切换默认的数据源，以此来控制事务关联的数据源
-     * @param targetDataSourceName
-     */
-    public void switchDefaultDataSource(String targetDataSourceName) {
-        // 支持事务，切换回默认的支持事务的数据源
-        log.info("Default datasource has been changed to [{}].", new Object[]{targetDataSourceName});
-        DataSourceHolder.DATASOURCE_NAMES.set(targetDataSourceName);
-        setDefaultTargetDataSource(determineTargetDataSource());
-    }
-
     public String getDefaultDatasourceName() {
         return defaultDatasourceName;
     }
