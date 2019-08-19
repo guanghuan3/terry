@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 /**
  * 多数据源切换切面
- * 支持事务注解@Transactional，添加@Order，保证切换数据源的执行顺序在DataSourceTransactionManager之前执行
+ * 支持事务注解@Transactional，添加@Order，保证切换数据源的执行顺序在DataSourceTransactionManager开启事务之前执行
  */
 @Order(value=10)
 @Aspect
