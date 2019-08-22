@@ -11,4 +11,10 @@ public class CommonConstants {
     public static final String CAP_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static final String LOW_CAHR = "abcdefghijklmnopqrstuvwxyz";
+
+    public static final String COMMA = ".";
+
+    public static final String DOT= ",";
+
+    public static final String AT = "@";
 }
