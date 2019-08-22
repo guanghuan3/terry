@@ -9,6 +9,7 @@ import com.terry.archer.excel.enums.ExcelAction;
 import com.terry.archer.excel.enums.ExcelFileType;
 import com.terry.archer.utils.ApplicationContextUtil;
 import com.terry.archer.utils.CommonUtil;
+import com.terry.archer.utils.DateUtil;
 import com.terry.archer.utils.StringUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -16,7 +17,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -49,6 +49,10 @@ public class ExcelExportor {
     private Integer sizePerPage;
 
     private Workbook workbook;
+
+    public ExcelExportor() {
+        this(DateUtil.getFormattedTime(new Date()), DEFAULT_PER_PAGE_SIZE);
+    }
 
     public ExcelExportor(String fileName) {
         this(fileName, DEFAULT_PER_PAGE_SIZE);
@@ -168,6 +172,7 @@ public class ExcelExportor {
         Object data = null;
         // 临时存放ExcelField对象
         ExcelField anno = null;
+        // 分页的临时数据集合
         List<?> subDatas = null;
 
         // 根据记录数得出表单页数
@@ -175,9 +180,11 @@ public class ExcelExportor {
                 ? (datas.size() % sizePerPage > 0) ? datas.size() / sizePerPage + 1 : datas.size() / sizePerPage
                 : 0;
         for (int k = 0; k < page; k ++) {
+            // 将数据按照每页显示书分割
             subDatas = datas.subList(k*sizePerPage, ((k+1)*sizePerPage) > datas.size() ? datas.size() : (k+1)*sizePerPage);
-
+            // 按照页数生成Sheet
             Sheet sheet = workbook.createSheet("Sheet_"+String.valueOf(k));
+
             // 表头格式
             CellStyle headStyle = workbook.createCellStyle();
             headStyle.setAlignment(HorizontalAlignment.CENTER);
@@ -219,8 +226,6 @@ public class ExcelExportor {
                     renderCell(cell, anno, value);
                 }
             }
-
-
         }
     }
 
@@ -289,22 +294,5 @@ public class ExcelExportor {
                 }
             }
         }
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        List<User> users = new ArrayList<>();
-        User user = new User("zhangsan", 13, new Date());
-        users.add(user);
-
-        user = new User("lisi", 14, new Date());
-        users.add(user);
-
-        user = new User("wangwu", 15, new Date());
-        users.add(user);
-
-//        new ExcelExportor("测试导出1.xlsx").exportExcel(users, User.class, new FileOutputStream("D:/zhangwenbin/test/测试导出1.xlsx"));
-
-        new ExcelExportor("测试导出2..xlsx", 2).exportExcel(users, User.class, new FileOutputStream("D:/zhangwenbin/test/测试导出2.xlsx"));
     }
 }
