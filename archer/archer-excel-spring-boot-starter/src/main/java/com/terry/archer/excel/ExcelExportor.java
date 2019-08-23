@@ -50,14 +50,26 @@ public class ExcelExportor {
 
     private Workbook workbook;
 
+    /**
+     * 默认通过当前时间戳生成文件名，每页显示数为默认数
+     */
     public ExcelExportor() {
         this(DateUtil.getFormattedTime(new Date()), DEFAULT_PER_PAGE_SIZE);
     }
 
+    /**
+     * 指定文件名，默认每页显示数
+     * @param fileName
+     */
     public ExcelExportor(String fileName) {
         this(fileName, DEFAULT_PER_PAGE_SIZE);
     }
 
+    /**
+     * 指定文件名和默认显示数
+     * @param fileName
+     * @param sizePerPage
+     */
     public ExcelExportor(String fileName, Integer sizePerPage) {
         this.fileName = fileName;
         this.sizePerPage = CommonUtil.isNotEmpty(sizePerPage) && sizePerPage > 0 ? sizePerPage : DEFAULT_PER_PAGE_SIZE;
