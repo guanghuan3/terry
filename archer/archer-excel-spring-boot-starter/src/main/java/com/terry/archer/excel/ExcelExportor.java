@@ -175,10 +175,12 @@ public class ExcelExportor {
         // 分页的临时数据集合
         List<?> subDatas = null;
 
-        // 根据记录数得出表单页数
+        // 根据记录数和每页sheet显示数得出sheet页总数
         int page = CommonUtil.isNotEmpty(datas)
+                // 通过总数与每页显示数取模判断。1、多出数据不满一页：总数/每页显示数+1；2、刚好满页：总数/每页显示数
                 ? (datas.size() % sizePerPage > 0) ? datas.size() / sizePerPage + 1 : datas.size() / sizePerPage
-                : 0;
+                // 数据为空则默认1页
+                : 1;
         for (int k = 0; k < page; k ++) {
             // 将数据按照每页显示书分割
             subDatas = datas.subList(k*sizePerPage, ((k+1)*sizePerPage) > datas.size() ? datas.size() : (k+1)*sizePerPage);
