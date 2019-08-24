@@ -17,10 +17,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -35,6 +36,8 @@ public class ExcelExportor {
     private static Logger logger = LoggerFactory.getLogger(ExcelExportor.class);
 
     private static final String EXCEL_EXT_XLSX = ".xlsx";
+
+    private static final String EXCEL_EXT_XLS = ".xls";
 
     public static final Integer DEFAULT_PER_PAGE_SIZE = 5000;
 
@@ -54,7 +57,7 @@ public class ExcelExportor {
      * 默认通过当前时间戳生成文件名，每页显示数为默认数
      */
     public ExcelExportor() {
-        this(DateUtil.getFormattedTime(new Date()), DEFAULT_PER_PAGE_SIZE);
+        this(DateUtil.getFormattedTime(new Date())+EXCEL_EXT_XLSX);
     }
 
     /**
@@ -79,7 +82,14 @@ public class ExcelExportor {
 
     private Workbook createWorkbook(String fileName) {
         if (CommonUtil.isNotEmpty(fileName)) {
-            String ext = fileName.substring(fileName.lastIndexOf("."));
+            // 文件拓展名
+            String ext = null;
+            // 结尾不包含拓展名
+            if (!fileName.endsWith(EXCEL_EXT_XLSX) && !fileName.endsWith(EXCEL_EXT_XLS)) {
+                ext = this.fileName += EXCEL_EXT_XLSX;
+            } else {
+                ext = fileName.substring(fileName.lastIndexOf("."));
+            }
             return createWorkbook(EXCEL_EXT_XLSX.equals(ext) ? ExcelFileType.XLSX : ExcelFileType.XLS);
         } else {
             // 默认生成HSSFWorkBook
@@ -97,13 +107,35 @@ public class ExcelExportor {
     }
 
     /**
+     * 输出文件到指定的目录下
+     * @param datas
+     * @param clazz
+     * @param fileDir
+     * @throws Exception
+     */
+    public void exportExcel(List<?> datas, Class<?> clazz, String fileDir) throws Exception {
+        exportExcel(datas, clazz, new FileOutputStream(fileDir + File.separator + fileName));
+    }
+
+    public void exportExcel(List<?> datas, Class<?> clazz, HttpServletResponse response) throws Exception {
+        // 设置响应头
+        handleResponseHeader(response);
+        exportExcel(datas, clazz, response.getOutputStream());
+    }
+
+    private void handleResponseHeader(HttpServletResponse response) throws Exception {
+        response.setContentType("application/octet-stream; charset=UTF-8");
+        response.addHeader("Content-Disposition", "attachment;filename="+ URLEncoder.encode(fileName, "UTF-8"));
+    }
+
+    /**
      * 输出文件到指定目录对象
      * @param datas
      * @param clazz
      * @param os
      * @throws Exception
      */
-    public void exportExcel(List<?> datas, Class<?> clazz, OutputStream os) throws Exception {
+    private void exportExcel(List<?> datas, Class<?> clazz, OutputStream os) throws Exception {
         if (CommonUtil.isNotEmpty(datas)
                 && CommonUtil.isNotEmpty(clazz)
                 && CommonUtil.isNotEmpty(os)) {
