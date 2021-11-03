@@ -17,6 +17,10 @@
 
     <packaging>jar</packaging>
 
+    <!--
+        将工程编译成jar包后，可以通过以下命令将打出来的jar包安装到本地maven库供其他工程使用
+        mvn install:install-file -DgroupId=com.terry -DartifactId=archer-utils-spring-boot-starter -Dversion=1.0.0 -Dpackaging=jar -Dfile=D:\zhangwenbin\codes\archer\archer\archer-utils-spring-boot-starter\target\archer-utils-spring-boot-starter-1.0-SNAPSHOT.jar
+    -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>

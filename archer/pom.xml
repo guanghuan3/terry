@@ -34,6 +34,10 @@
     </dependency>
   </dependencies>
 
+  <!--
+  将工程编译成jar包后，可以通过以下命令将打出来的jar包安装到本地maven库供其他工程使用
+   mvn install:install-file -DgroupId=com.terry -DartifactId=archer -Dversion=1.0.0 -Dpackaging=jar -Dfile=F:\soft_lib\maven_repo\commons-validator-1.0.1.jar
+   -->
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
