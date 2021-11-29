@@ -20,6 +20,12 @@ public class DSAspect {
     @Autowired
     private DataSource dataSource;
 
+    public DSAspect(){}
+
+    public DSAspect(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     /**
      * 执行业务之前切换到指定的数据源
      * @param ds
