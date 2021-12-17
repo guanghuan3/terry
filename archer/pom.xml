@@ -12,6 +12,7 @@
     <module>archer-utils-spring-boot-starter</module>
     <module>archer-datasource-spring-boot-starter</module>
     <module>archer-cache-spring-boot-starter</module>
+    <module>archer-business-module</module>
   </modules>
 
   <name>archer</name>
@@ -27,6 +28,17 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.16.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>5.1.8.RELEASE</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
